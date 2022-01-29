@@ -3,6 +3,8 @@ package com.example.springboothibernate.Model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -22,4 +24,14 @@ public class Book {
     @JoinColumn(name="g_id")
     @Access(AccessType.PROPERTY)
     protected Genre genre;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "books_authors",
+            //foreign key for EmployeeEntity in employee_car table
+            joinColumns = @JoinColumn(name = "b_id"),
+            //foreign key for other side - EmployeeEntity in employee_car table
+            inverseJoinColumns = @JoinColumn(name = "a_id")
+    )
+    @Access(AccessType.PROPERTY)
+    protected List<Author> authors = new ArrayList<>();
 }

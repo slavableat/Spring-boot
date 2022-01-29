@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public class GenreService {
-    private GenreRepository genreRepository;
+    private final GenreRepository genreRepository;
 @Autowired
     public GenreService(GenreRepository genreRepository) {
         this.genreRepository = genreRepository;
@@ -30,7 +30,7 @@ public class GenreService {
         genreRepository.deleteById(id);
     }
 
-    public void updateGenre(Book book){
+    public void updateGenre(Genre genre){
 
     }
 }

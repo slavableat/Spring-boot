@@ -23,6 +23,7 @@
                 <th>Id</th>
                 <th>Book name</th>
                 <th>Genre </th>
+                <th>Authors</th>
             </tr>
             </thead>
             <tbody>
@@ -30,6 +31,10 @@
                 <td th:text="${book.id}"></td>
                 <td th:text="${book.name}"></td>
                 <td th:text="${book.genre.name}"></td>
+                <td > <p  th:each="author : ${book.authors}">
+                    <span th:text="${author.name}"></span>
+                </p>
+                </td>
             </tr>
             </tbody>
         </table>
