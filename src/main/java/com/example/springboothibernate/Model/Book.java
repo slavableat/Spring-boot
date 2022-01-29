@@ -12,7 +12,7 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="b_id")
     @Access(AccessType.PROPERTY)
-    protected int id;
+    protected Long id;
 
     @Column(name="b_name")
     @Access(AccessType.PROPERTY)
