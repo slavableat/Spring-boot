@@ -17,4 +17,9 @@ public class Book {
     @Column(name="b_name")
     @Access(AccessType.PROPERTY)
     protected String name;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="g_id")
+    @Access(AccessType.PROPERTY)
+    protected Genre genre;
 }

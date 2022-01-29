@@ -22,12 +22,14 @@
             <tr>
                 <th>Id</th>
                 <th>Book name</th>
+                <th>Genre </th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="book : ${books}">
                 <td th:text="${book.id}"></td>
                 <td th:text="${book.name}"></td>
+                <td th:text="${book.genre.name}"></td>
             </tr>
             </tbody>
         </table>
