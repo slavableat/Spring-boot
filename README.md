@@ -1,0 +1,1 @@
+В REPOSITORY был изменен тип b_id с int на Long
