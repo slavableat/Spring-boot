@@ -1,5 +1,6 @@
 package com.example.springboothibernate.Controller;
 
+import com.example.springboothibernate.Model.Author;
 import com.example.springboothibernate.Model.Book;
 import com.example.springboothibernate.Model.Genre;
 import com.example.springboothibernate.Service.AuthorService;
@@ -33,10 +34,18 @@ public class BookController {
     @GetMapping("/delete/{id}")
     public String deleteBook(@PathVariable("id") Long id) {
         Book book = (Book)bookService.findById(id);
-        if (book == null) return "redirect:/books";
+        if (book.getName() == null) return "redirect:/books";
+        for (Author author:book.getAuthors()) {
+            author.getBooks().remove(book);
+            if(author.getBooks().isEmpty()) authorService.deleteById(author.getId());
+            else authorService.saveAuthor(author);
+        }
         book.getAuthors().clear();
+        book.getGenre().getBooks().remove(book);
+        if(book.getGenre().getBooks().isEmpty()) genreService.deleteById(book.getGenre().getId());
+        else genreService.saveGenre(book.getGenre());//orphanRemoval=true после удаления из колелкции жанра удалится и сама книга
         book.setGenre(null);
-        bookService.deleteById(book.getId());
+        bookService.delete(book);
         return "redirect:/books";
     }
 

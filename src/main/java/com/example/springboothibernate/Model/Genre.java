@@ -1,10 +1,13 @@
 package com.example.springboothibernate.Model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,5 +26,5 @@ public class Genre {
     protected String name;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "genre", orphanRemoval = true) //или DETACH
-    protected List<Book> books = new ArrayList<Book>();
+    protected Set<Book> books = new HashSet<>();
 }

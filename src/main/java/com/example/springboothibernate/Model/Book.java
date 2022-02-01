@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,5 +38,5 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "a_id")
     )
     @Access(AccessType.PROPERTY)
-    protected List<Author> authors = new ArrayList<>();
+    protected Set<Author> authors = new HashSet<>();
 }

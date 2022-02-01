@@ -13,9 +13,9 @@ public class BookService {
     @Autowired
     private  BookRepository bookRepository;
 
-    public Book findById(Long id){
+    public Book findById(Long id){//КОСТЫЛИЩЕ, не подругражет экземпляр наголо, ттоько из кэша
         findAll();
-        return bookRepository.getById(id);
+        return bookRepository.getOne(id);
     }
 
     public List<Book> findAll(){
@@ -26,8 +26,8 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public void deleteById(Long id){
-        bookRepository.deleteById(id);
+    public void delete(Book book){
+        bookRepository.delete(book);
     }
 
     public void updateBook(Book book){
