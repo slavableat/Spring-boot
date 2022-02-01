@@ -26,8 +26,8 @@ public class BookController {
     @GetMapping("/books")
     public String findAll(Model model) {
         List<Book> books = bookService.findAll();
-        model.addAttribute("books", books);
-        return "list-book.jsp";
+        model.addAttribute("listBook", books);
+        return "list-book";
     }
 
     @GetMapping("/delete/{id}")
@@ -40,5 +40,15 @@ public class BookController {
         return "redirect:/books";
     }
 
+    @GetMapping("/book-create")
+    public String createUserForm(Book book){
+        return "book-form";
+    }
+
+    @PostMapping("/book-create")
+    public String createUser(Book book){
+        bookService.saveBook(book);
+        return "redirect:/books";
+    }
 
 }
