@@ -9,11 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public class GenreService {
-    private final GenreRepository genreRepository;
-@Autowired
-    public GenreService(GenreRepository genreRepository) {
-        this.genreRepository = genreRepository;
-    }
+    @Autowired
+    private  GenreRepository genreRepository;
 
     public Genre saveGenre(Genre genre){
         return genreRepository.save(genre);
@@ -24,7 +21,6 @@ public class GenreService {
     public List<Genre> findAll(){
         return genreRepository.findAll();
     }
-
 
     public void deleteById(Long id){
         genreRepository.deleteById(id);
