@@ -29,4 +29,8 @@ public class GenreService {
     public void updateGenre(Genre genre){
 
     }
+
+    public Genre findByName(String name){
+        return genreRepository.findByName(name);
+    }
 }
