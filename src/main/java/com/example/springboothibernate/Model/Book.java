@@ -30,13 +30,7 @@ public class Book {
     @Access(AccessType.PROPERTY)
     protected Genre genre;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "books_authors",
-            //foreign key for EmployeeEntity in employee_car table
-            joinColumns = @JoinColumn(name = "b_id"),
-            //foreign key for other side - EmployeeEntity in employee_car table
-            inverseJoinColumns = @JoinColumn(name = "a_id")
-    )
+    @ManyToMany(mappedBy = "books", fetch = FetchType.EAGER)
     @Access(AccessType.PROPERTY)
     protected Set<Author> authors = new HashSet<>();
 }
