@@ -75,20 +75,19 @@ public class BookController {
         Genre findGEnre=genreService.findByName(book.getGenre().getName());
         if(findGEnre!=null) book.setGenre(findGEnre);
         book.getGenre().getBooks().add(book);
-        genreService.saveGenre(genre);
+        genreService.saveGenre(book.getGenre());
+        bookService.saveBook(book);
         for(Author auth :book.getAuthors())
         {
 
             if(authorService.findByName(auth.getName())!=null) {
-                book.getAuthors().remove(auth);
                 auth=authorService.findByName(auth.getName());
-                book.getAuthors().add(auth);
             }
             auth.getBooks().add(book);
             authorService.saveAuthor(auth);
 
         }
-        bookService.saveBook(book);
+        //bookService.saveBook(book);
         return "redirect:/books";
     }
 
