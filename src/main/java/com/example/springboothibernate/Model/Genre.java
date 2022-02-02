@@ -27,4 +27,5 @@ public class Genre {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "genre", orphanRemoval = true) //или DETACH
     protected Set<Book> books = new HashSet<>();
+
 }
