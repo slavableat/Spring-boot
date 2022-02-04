@@ -9,16 +9,16 @@ import com.example.springboothibernate.Service.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 
-@Controller
+
+
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
+@RestController
 public class BookController {
     @Autowired
     private BookService bookService;
@@ -28,10 +28,9 @@ public class BookController {
     private AuthorService authorService;
 
     @GetMapping("/books")
-    public String findAll(Model model) {
+    public List<Book> findAll() {
         List<Book> books = bookService.findAll();
-        model.addAttribute("listBook", books);
-        return "list-book";
+        return books;
     }
 
     @GetMapping("/delete/{id}")
@@ -91,24 +90,6 @@ public class BookController {
         return "redirect:/books";
     }
 
-    @PostMapping("/book-create")
-    public String createUser(Book book,Model model){
-        List<Book> arr;
-        String x=(String)model.getAttribute("name");
-        return "redirect:/books";
-    }
-    //@GetMapping("/book-update/{id}")
-    //public String updateUserForm(@PathVariable("id") Long id, Model model){
-    //    User user = userService.findById(id);
-    //    model.addAttribute("user", user);
-    //    return "user-update";
-    //}
-//
-    //@PostMapping("/user-update")
-    //public String updateUser(User user){
-    //    userService.saveUser(user);
-    //    return "redirect:/users";
-    //}
     @GetMapping("/book-edit/{id}")
     public String editBook(@PathVariable("id") Long id){
         Book book=new Book();//test book
