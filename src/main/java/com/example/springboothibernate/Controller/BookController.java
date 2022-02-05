@@ -7,6 +7,8 @@ import com.example.springboothibernate.Service.AuthorService;
 import com.example.springboothibernate.Service.BookService;
 import com.example.springboothibernate.Service.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
-@RestController
+@Controller
 public class BookController {
     @Autowired
     private BookService bookService;
@@ -28,9 +27,10 @@ public class BookController {
     private AuthorService authorService;
 
     @GetMapping("/books")
-    public List<Book> findAll() {
+    public ResponseEntity<List<Book>> findAll() {
         List<Book> books = bookService.findAll();
-        return books;
+        ResponseEntity<List<Book>> response=new ResponseEntity<>(books, HttpStatus.OK);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/delete/{id}")
