@@ -13,11 +13,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-@Controller
+
+@CrossOrigin(origins = "http://localhost:4200")
+@RestController
 public class BookController {
     @Autowired
     private BookService bookService;
@@ -33,10 +33,9 @@ public class BookController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteBook(@PathVariable("id") Long id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Map<String,Boolean>> deleteBook(@PathVariable("id") Long id) {
         Book book = (Book)bookService.findById(id);
-        if (book.getName() == null) return "redirect:/books";
         List<Author> mustBEDeleted=new ArrayList<>();
         for (Author author:book.getAuthors()) {
             mustBEDeleted.add(author);
@@ -53,7 +52,9 @@ public class BookController {
         else genreService.saveGenre(book.getGenre());
         book.setGenre(null);
         bookService.delete(book);
-        return "redirect:/books";
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/book-create") //тест добавления
@@ -91,7 +92,7 @@ public class BookController {
     }
 
     @GetMapping("/book-edit/{id}")
-    public String editBook(@PathVariable("id") Long id){
+    public String editBook(@PathVariable Long id){
         Book book=new Book();//test book
         book.setName("Adventures 2");//test book
         Genre genre=new Genre();//test book

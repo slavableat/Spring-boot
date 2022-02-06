@@ -1,5 +1,6 @@
 package com.example.springboothibernate.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import javax.persistence.*;
@@ -22,7 +23,8 @@ public class Genre {
     @Access(AccessType.PROPERTY)
     protected String name;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "genre", orphanRemoval = true) //или DETACH
+    @JsonIgnoreProperties("genre")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "genre", orphanRemoval = true) //или DETACH
     protected Set<Book> books = new HashSet<>();
 
 }

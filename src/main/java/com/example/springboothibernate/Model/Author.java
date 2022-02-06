@@ -1,5 +1,6 @@
 package com.example.springboothibernate.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +28,8 @@ public class Author {
     @Access(AccessType.PROPERTY)
     protected String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("authors")
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "books_authors",
             //foreign key for EmployeeEntity in employee_car table
             joinColumns = @JoinColumn(name = "a_id"),
