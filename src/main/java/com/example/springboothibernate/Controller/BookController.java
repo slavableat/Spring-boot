@@ -57,19 +57,19 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/book-create") //тест добавления
-    public String createUserForm(){
-        Book book=new Book();
-        book.setName("Adventures");             //test book
-        Genre genre=new Genre();                //test book
-        genre.setName("Fantasy");               //test book
+    @PostMapping("/book-create") //тест добавления
+    public ResponseEntity<Map<String,Boolean>> addBook(@RequestBody  Book book){
+       // Book book=new Book();
+       // book.setName("Adventures");             //test book
+       // Genre genre=new Genre();                //test book
+       // genre.setName("Fantasy");               //test book
         Author author1=new Author();                //test book
         author1.setName("Tolstoy");             //test book
         Author author2=new Author();                //test book
         author2.setName("Esenin");              //test book
         Author author3=new Author();                //test book
         author3.setName("Dostoevskiy");             //test book
-        book.setGenre(genre);               //test book
+        //book.setGenre(genre);               //test book
         book.getAuthors().add(author1);             //test book
         book.getAuthors().add(author2);             //test book
         book.getAuthors().add(author3);             //test book
@@ -88,7 +88,9 @@ public class BookController {
 
         }
         //bookService.saveBook(book);
-        return "redirect:/books";
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("created", Boolean.TRUE);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/book-edit/{id}")
