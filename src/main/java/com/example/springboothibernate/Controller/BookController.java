@@ -27,28 +27,37 @@ public class BookController {
     private AuthorService authorService;
 
     @GetMapping("/books")
-    public ResponseEntity<List<Book>> findAll() {
+    public ResponseEntity<List<Book>> findAllBooks() {
         List<Book> books = bookService.findAll();
-        ResponseEntity<List<Book>> response=new ResponseEntity<>(books, HttpStatus.OK);
         return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+    @GetMapping("/genres")
+    public ResponseEntity<List<Genre>> findAllGenres() {
+        List<Genre> genres = genreService.findAll();
+        return new ResponseEntity<>(genres, HttpStatus.OK);
+    }
+    @GetMapping("/authors")
+    public ResponseEntity<List<Author>> findAllAuthors() {
+        List<Author> authors = authorService.findAll();
+        return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Map<String,Boolean>> deleteBook(@PathVariable("id") Long id) {
-        Book book = (Book)bookService.findById(id);
-        List<Author> mustBEDeleted=new ArrayList<>();
-        for (Author author:book.getAuthors()) {
+    public ResponseEntity<Map<String, Boolean>> deleteBook(@PathVariable("id") Long id) {
+        Book book = (Book) bookService.findById(id);
+        List<Author> mustBEDeleted = new ArrayList<>();
+        for (Author author : book.getAuthors()) {
             mustBEDeleted.add(author);
             author.getBooks().remove(book);
         }
         book.getAuthors().clear();
         bookService.saveBook(book);
-        for (Author author:mustBEDeleted) {
-            if(author.getBooks().isEmpty()) authorService.deleteById(author.getId());
+        for (Author author : mustBEDeleted) {
+            if (author.getBooks().isEmpty()) authorService.deleteById(author.getId());
         }
         mustBEDeleted.clear();
         book.getGenre().getBooks().remove(book);
-        if(book.getGenre().getBooks().isEmpty()) genreService.deleteById(book.getGenre().getId());
+        if (book.getGenre().getBooks().isEmpty()) genreService.deleteById(book.getGenre().getId());
         else genreService.saveGenre(book.getGenre());
         book.setGenre(null);
         bookService.delete(book);
@@ -58,90 +67,72 @@ public class BookController {
     }
 
     @PostMapping("/book-create") //тест добавления
-    public ResponseEntity<Map<String,Boolean>> addBook(@RequestBody  Book book){
-       // Book book=new Book();
-       // book.setName("Adventures");             //test book
-       // Genre genre=new Genre();                //test book
-       // genre.setName("Fantasy");               //test book
-        Author author1=new Author();                //test book
-        author1.setName("Tolstoy");             //test book
-        Author author2=new Author();                //test book
-        author2.setName("Esenin");              //test book
-        Author author3=new Author();                //test book
-        author3.setName("Dostoevskiy");             //test book
-        //book.setGenre(genre);               //test book
-        book.getAuthors().add(author1);             //test book
-        book.getAuthors().add(author2);             //test book
-        book.getAuthors().add(author3);             //test book
-        Genre findGEnre=genreService.findByName(book.getGenre().getName());
-        if(findGEnre!=null) book.setGenre(findGEnre);
+    public ResponseEntity<Map<String, Boolean>> addBook(@RequestBody Book book) {
+        Genre findGEnre = genreService.findByName(book.getGenre().getName());
+        if (findGEnre != null) book.setGenre(findGEnre);
         book.getGenre().getBooks().add(book);
         genreService.saveGenre(book.getGenre());
         bookService.saveBook(book);
-        for(Author auth :book.getAuthors())
-        {
-            if(authorService.findByName(auth.getName())!=null) {
-                auth=authorService.findByName(auth.getName());
+        for (Author auth : book.getAuthors()) {
+            if (authorService.findByName(auth.getName()) != null) {
+                auth = authorService.findByName(auth.getName());
             }
             auth.getBooks().add(book);
             authorService.saveAuthor(auth);
 
         }
-        //bookService.saveBook(book);
         Map<String, Boolean> response = new HashMap<>();
         response.put("created", Boolean.TRUE);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/book-edit/{id}")
-    public String editBook(@PathVariable Long id){
-        Book book=new Book();//test book
-        book.setName("Adventures 2");//test book
-        Genre genre=new Genre();//test book
-        genre.setName("Mathanal");//test book
-        Author author1=new Author();//test book
-        author1.setName("Brodskiy");//test book
-        Author author2=new Author();//test book
-        author2.setName("Esenin");//test book
-        Author author3=new Author();//test book
-        author3.setName("Pavluk");//test book
-        book.setGenre(genre);//test book
-        book.getAuthors().add(author1);//test book
-        book.getAuthors().add(author2);//test book
-        book.getAuthors().add(author3);//test book
+    public ResponseEntity<Book> getById(@PathVariable Long id) {
+        Book book = bookService.findById(id);
+        return new ResponseEntity<>(book, HttpStatus.OK);
+    }
 
-        Book oldBook=bookService.findById(id);
-        if(oldBook==null) return "redirect:/books";
-        if(!book.getName().equals(oldBook.getName())) oldBook.setName(book.getName());
-        List<Author> mustBEDeleted=new ArrayList<>();
-        for (Author author:oldBook.getAuthors()) {
+    @PostMapping("/book-edit/{id}")
+    public ResponseEntity<Map<String, Boolean>> editBook(@RequestBody Book book) {
+        Book oldBook = bookService.findById(book.getId());
+        if (oldBook == null) {
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("edit", Boolean.FALSE);
+            return ResponseEntity.ok(response);
+        }
+        if (!book.getName().equals(oldBook.getName())) oldBook.setName(book.getName());
+        List<Author> mustBEDeleted = new ArrayList<>();
+        for (Author author : oldBook.getAuthors()) {
             mustBEDeleted.add(author);
             author.getBooks().remove(oldBook);
         }
         oldBook.getAuthors().clear();
         // bookService.saveBook(book);
-        for (Author author:mustBEDeleted) {
-            if(author.getBooks().isEmpty()) authorService.deleteById(author.getId());
+        for (Author author : mustBEDeleted) {
+            if (author.getBooks().isEmpty()) authorService.deleteById(author.getId());
         }
         mustBEDeleted.clear();
-        Iterator<Author> iterator=book.getAuthors().iterator();
-        while(iterator.hasNext()){
-            Author author=iterator.next();
-            Author oldAuthor=authorService.findByName(author.getName());
-            if(oldAuthor!=null) author=oldAuthor;
-                author.getBooks().add(oldBook);
-                authorService.saveAuthor(author);
+        Iterator<Author> iterator = book.getAuthors().iterator();
+        while (iterator.hasNext()) {
+            Author author = iterator.next();
+            Author oldAuthor = authorService.findByName(author.getName());
+            if (oldAuthor != null) author = oldAuthor;
+            author.getBooks().add(oldBook);
+            authorService.saveAuthor(author);
         }
-        long mustBeDeletedGenreId=-99999;
-        if(!book.getGenre().getName().equals(oldBook.getGenre().getName())){
+        long mustBeDeletedGenreId = -99999;
+        if (!book.getGenre().getName().equals(oldBook.getGenre().getName())) {
             oldBook.getGenre().getBooks().remove(oldBook);
-            if(oldBook.getGenre().getBooks().isEmpty()) mustBeDeletedGenreId=oldBook.getGenre().getId();
-            Genre oldGenre=genreService.findByName(book.getGenre().getName());
-            if(oldGenre!=null) oldBook.setGenre(oldGenre);
+            if (oldBook.getGenre().getBooks().isEmpty()) mustBeDeletedGenreId = oldBook.getGenre().getId();
+            Genre oldGenre = genreService.findByName(book.getGenre().getName());
+            if (oldGenre != null) oldBook.setGenre(oldGenre);
             else oldBook.setGenre(book.getGenre());
             oldBook.getGenre().getBooks().add(oldBook);
             genreService.saveGenre(oldBook.getGenre());
         }
-        if(mustBeDeletedGenreId!=-99999) genreService.deleteById(mustBeDeletedGenreId);
-    return "redirect:/books";}
+        if (mustBeDeletedGenreId != -99999) genreService.deleteById(mustBeDeletedGenreId);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("edit", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
 }

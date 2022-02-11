@@ -6,16 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class BookService {
     @Autowired
     private  BookRepository bookRepository;
 
-    public Book findById(Long id){//КОСТЫЛИЩЕ, не подругражет экземпляр наголо, ттоько из кэша
-        findAll();
-        return bookRepository.getOne(id);
+    public Book findById(Long id){
+       // findAll();//КОСТЫЛИЩЕ, не подругражет экземпляр наголо, ттоько из кэша
+        return bookRepository.findById(id).get();
     }
 
     public List<Book> findAll(){
