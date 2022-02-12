@@ -18,4 +18,4 @@
 * изменение книги
 * получение книги по id
  
-![alt text](library.png "Описание будет тут")
+![alt text](library.png "Скриншот бд MySQL")
