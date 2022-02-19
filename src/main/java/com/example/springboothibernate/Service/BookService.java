@@ -14,7 +14,6 @@ public class BookService {
     private  BookRepository bookRepository;
 
     public Book findById(Long id){
-       // findAll();//КОСТЫЛИЩЕ, не подругражет экземпляр наголо, ттоько из кэша
         return bookRepository.findById(id).get();
     }
 
@@ -30,7 +29,4 @@ public class BookService {
         bookRepository.delete(book);
     }
 
-    public void updateBook(Book book){
-
-    }
 }

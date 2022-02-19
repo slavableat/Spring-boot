@@ -13,6 +13,7 @@ import java.util.Set;
 @Table(name="genres")
 
 public class Genre {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Access(AccessType.PROPERTY)
@@ -24,7 +25,7 @@ public class Genre {
     protected String name;
 
     @JsonIgnoreProperties("genre")
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "genre", orphanRemoval = true) //или DETACH
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "genre", orphanRemoval = true)
     protected Set<Book> books = new HashSet<>();
 
 }

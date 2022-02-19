@@ -9,14 +9,10 @@ import com.example.springboothibernate.Service.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
-
-@CrossOrigin(origins = {"http://localhost:4200","http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:3000","http://localhost:4200"})
 @RestController
 public class BookController {
     @Autowired
@@ -66,7 +62,7 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/book-create") //тест добавления
+    @PostMapping("/book-create")
     public ResponseEntity<Map<String, Boolean>> addBook(@RequestBody Book book) {
         Genre findGEnre = genreService.findByName(book.getGenre().getName());
         if (findGEnre != null) book.setGenre(findGEnre);
@@ -79,7 +75,6 @@ public class BookController {
             }
             auth.getBooks().add(book);
             authorService.saveAuthor(auth);
-
         }
         Map<String, Boolean> response = new HashMap<>();
         response.put("created", Boolean.TRUE);
@@ -92,7 +87,7 @@ public class BookController {
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
-    @PostMapping("/book-edit/{id}")
+    @PutMapping("/book-edit/{id}")
     public ResponseEntity<Map<String, Boolean>> editBook(@RequestBody Book book) {
         Book oldBook = bookService.findById(book.getId());
         if (oldBook == null) {
@@ -107,7 +102,6 @@ public class BookController {
             author.getBooks().remove(oldBook);
         }
         oldBook.getAuthors().clear();
-        // bookService.saveBook(book);
         for (Author author : mustBEDeleted) {
             if (author.getBooks().isEmpty()) authorService.deleteById(author.getId());
         }
