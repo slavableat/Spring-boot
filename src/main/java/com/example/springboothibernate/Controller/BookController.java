@@ -23,23 +23,24 @@ public class BookController {
     private AuthorRepository authorRepository;
 
     @GetMapping("/books")
-    public ResponseEntity<List<Book>> findAllBooks() {
+    public ResponseEntity findAllBooks() {
         List<Book> books = bookRepository.findAll();
+
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
     @GetMapping("/genres")
-    public ResponseEntity<List<Genre>> findAllGenres() {
+    public ResponseEntity findAllGenres() {
         List<Genre> genres = genreRepository.findAll();
         return new ResponseEntity<>(genres, HttpStatus.OK);
     }
     @GetMapping("/authors")
-    public ResponseEntity<List<Author>> findAllAuthors() {
+    public ResponseEntity findAllAuthors() {
         List<Author> authors = authorRepository.findAll();
         return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Map<String, Boolean>> deleteBook(@PathVariable("id") Long id) {
+    public ResponseEntity deleteBook(@PathVariable("id") Long id) {
         Book book =  bookRepository.findById(id).get();
         if(book==null) {
             Map<String, Boolean> response = new HashMap<>();
@@ -68,7 +69,7 @@ public class BookController {
     }
 
     @PostMapping("/book-create")
-    public ResponseEntity<Map<String, Boolean>> addBook(@RequestBody Book book) {
+    public ResponseEntity addBook(@RequestBody Book book) {
         Genre findGEnre = genreRepository.findByName(book.getGenre().getName());
         if (findGEnre != null) book.setGenre(findGEnre);
         book.getGenre().getBooks().add(book);
@@ -87,14 +88,14 @@ public class BookController {
     }
 
     @GetMapping("/book-edit/{id}")
-    public ResponseEntity<Book> getById(@PathVariable Long id) {
+    public ResponseEntity getById(@PathVariable Long id) {
         Book book = bookRepository.findById(id).get();
-        if(book==null) return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+        if(book==null) return  ResponseEntity.badRequest().body(null);
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @PutMapping("/book-edit/{id}")
-    public ResponseEntity<Map<String, Boolean>> editBook(@RequestBody Book book) {
+    public ResponseEntity editBook(@RequestBody Book book) {
         Book oldBook = bookRepository.findById(book.getId()).get();
         if (oldBook == null) {
             Map<String, Boolean> response = new HashMap<>();
