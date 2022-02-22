@@ -3,9 +3,9 @@ package com.example.springboothibernate.Controller;
 import com.example.springboothibernate.Model.Author;
 import com.example.springboothibernate.Model.Book;
 import com.example.springboothibernate.Model.Genre;
-import com.example.springboothibernate.Service.AuthorService;
-import com.example.springboothibernate.Service.BookService;
-import com.example.springboothibernate.Service.GenreService;
+import com.example.springboothibernate.Repository.AuthorRepository;
+import com.example.springboothibernate.Repository.BookRepository;
+import com.example.springboothibernate.Repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,47 +16,52 @@ import java.util.*;
 @RestController
 public class BookController {
     @Autowired
-    private BookService bookService;
+    private BookRepository bookRepository;
     @Autowired
-    private GenreService genreService;
+    private GenreRepository genreRepository;
     @Autowired
-    private AuthorService authorService;
+    private AuthorRepository authorRepository;
 
     @GetMapping("/books")
     public ResponseEntity<List<Book>> findAllBooks() {
-        List<Book> books = bookService.findAll();
+        List<Book> books = bookRepository.findAll();
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
     @GetMapping("/genres")
     public ResponseEntity<List<Genre>> findAllGenres() {
-        List<Genre> genres = genreService.findAll();
+        List<Genre> genres = genreRepository.findAll();
         return new ResponseEntity<>(genres, HttpStatus.OK);
     }
     @GetMapping("/authors")
     public ResponseEntity<List<Author>> findAllAuthors() {
-        List<Author> authors = authorService.findAll();
+        List<Author> authors = authorRepository.findAll();
         return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Map<String, Boolean>> deleteBook(@PathVariable("id") Long id) {
-        Book book = (Book) bookService.findById(id);
+        Book book =  bookRepository.findById(id).get();
+        if(book==null) {
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("not-deleted", Boolean.FALSE);
+            return ResponseEntity.ok(response);
+        }
         List<Author> mustBEDeleted = new ArrayList<>();
         for (Author author : book.getAuthors()) {
             mustBEDeleted.add(author);
             author.getBooks().remove(book);
         }
         book.getAuthors().clear();
-        bookService.saveBook(book);
+        bookRepository.save(book);
         for (Author author : mustBEDeleted) {
-            if (author.getBooks().isEmpty()) authorService.deleteById(author.getId());
+            if (author.getBooks().isEmpty()) authorRepository.deleteById(author.getId());
         }
         mustBEDeleted.clear();
         book.getGenre().getBooks().remove(book);
-        if (book.getGenre().getBooks().isEmpty()) genreService.deleteById(book.getGenre().getId());
-        else genreService.saveGenre(book.getGenre());
+        if (book.getGenre().getBooks().isEmpty()) genreRepository.deleteById(book.getGenre().getId());
+        else genreRepository.save(book.getGenre());
         book.setGenre(null);
-        bookService.delete(book);
+        bookRepository.delete(book);
         Map<String, Boolean> response = new HashMap<>();
         response.put("deleted", Boolean.TRUE);
         return ResponseEntity.ok(response);
@@ -64,17 +69,17 @@ public class BookController {
 
     @PostMapping("/book-create")
     public ResponseEntity<Map<String, Boolean>> addBook(@RequestBody Book book) {
-        Genre findGEnre = genreService.findByName(book.getGenre().getName());
+        Genre findGEnre = genreRepository.findByName(book.getGenre().getName());
         if (findGEnre != null) book.setGenre(findGEnre);
         book.getGenre().getBooks().add(book);
-        genreService.saveGenre(book.getGenre());
-        bookService.saveBook(book);
+        genreRepository.save(book.getGenre());
+        bookRepository.save(book);
         for (Author auth : book.getAuthors()) {
-            if (authorService.findByName(auth.getName()) != null) {
-                auth = authorService.findByName(auth.getName());
+            if (authorRepository.findByName(auth.getName()) != null) {
+                auth = authorRepository.findByName(auth.getName());
             }
             auth.getBooks().add(book);
-            authorService.saveAuthor(auth);
+            authorRepository.save(auth);
         }
         Map<String, Boolean> response = new HashMap<>();
         response.put("created", Boolean.TRUE);
@@ -83,13 +88,14 @@ public class BookController {
 
     @GetMapping("/book-edit/{id}")
     public ResponseEntity<Book> getById(@PathVariable Long id) {
-        Book book = bookService.findById(id);
+        Book book = bookRepository.findById(id).get();
+        if(book==null) return new ResponseEntity<>(null,HttpStatus.CONFLICT);
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @PutMapping("/book-edit/{id}")
     public ResponseEntity<Map<String, Boolean>> editBook(@RequestBody Book book) {
-        Book oldBook = bookService.findById(book.getId());
+        Book oldBook = bookRepository.findById(book.getId()).get();
         if (oldBook == null) {
             Map<String, Boolean> response = new HashMap<>();
             response.put("edit", Boolean.FALSE);
@@ -103,28 +109,28 @@ public class BookController {
         }
         oldBook.getAuthors().clear();
         for (Author author : mustBEDeleted) {
-            if (author.getBooks().isEmpty()) authorService.deleteById(author.getId());
+            if (author.getBooks().isEmpty()) authorRepository.deleteById(author.getId());
         }
         mustBEDeleted.clear();
         Iterator<Author> iterator = book.getAuthors().iterator();
         while (iterator.hasNext()) {
             Author author = iterator.next();
-            Author oldAuthor = authorService.findByName(author.getName());
+            Author oldAuthor = authorRepository.findByName(author.getName());
             if (oldAuthor != null) author = oldAuthor;
             author.getBooks().add(oldBook);
-            authorService.saveAuthor(author);
+            authorRepository.save(author);
         }
-        long mustBeDeletedGenreId = -99999;
+        long mustBeDeletedGenreId = -99999; //магическое число - гарантировано удалится
         if (!book.getGenre().getName().equals(oldBook.getGenre().getName())) {
             oldBook.getGenre().getBooks().remove(oldBook);
             if (oldBook.getGenre().getBooks().isEmpty()) mustBeDeletedGenreId = oldBook.getGenre().getId();
-            Genre oldGenre = genreService.findByName(book.getGenre().getName());
+            Genre oldGenre = genreRepository.findByName(book.getGenre().getName());
             if (oldGenre != null) oldBook.setGenre(oldGenre);
             else oldBook.setGenre(book.getGenre());
             oldBook.getGenre().getBooks().add(oldBook);
-            genreService.saveGenre(oldBook.getGenre());
+            genreRepository.save(oldBook.getGenre());
         }
-        if (mustBeDeletedGenreId != -99999) genreService.deleteById(mustBeDeletedGenreId);
+        if (mustBeDeletedGenreId != -99999) genreRepository.deleteById(mustBeDeletedGenreId);
         Map<String, Boolean> response = new HashMap<>();
         response.put("edit", Boolean.TRUE);
         return ResponseEntity.ok(response);
