@@ -23,7 +23,7 @@ public class Author {
     protected String name;
 
     @JsonIgnoreProperties("authors")
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "books_authors",
             joinColumns = @JoinColumn(name = "a_id"),
             inverseJoinColumns = @JoinColumn(name = "b_id")

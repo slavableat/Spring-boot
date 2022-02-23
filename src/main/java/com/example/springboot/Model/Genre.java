@@ -25,7 +25,7 @@ public class Genre {
     protected String name;
 
     @JsonIgnoreProperties("genre")
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "genre", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "genre", orphanRemoval = true)
     protected Set<Book> books = new HashSet<>();
 
 }

@@ -97,7 +97,7 @@ public class BookController {
             genreRepository.save(oldBook.getGenre());
         }
         if (mustBeDeletedGenreId != -99999) genreRepository.deleteById(mustBeDeletedGenreId);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(oldBook,HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
