@@ -6,6 +6,7 @@ import com.example.springboot.Model.Author;
 import com.example.springboot.Model.Book;
 import com.example.springboot.Model.Genre;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -117,7 +118,6 @@ class SpringbootHibernateApplicationTests {
                 .andExpect(jsonPath("$.name").value(book.getName()))
                 .andExpect(jsonPath("$.genre.name").value(book.getGenre().getName()))
                 .andExpect(jsonPath("$.authors.size()").value(book.getAuthors().size()));
-        bookController.deleteBook(book.getId());
     }
 
     @Test
@@ -145,9 +145,11 @@ class SpringbootHibernateApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(book.getName()))
                 .andExpect(jsonPath("$.genre.name").value(book.getGenre().getName()));
-        bookController.deleteBook(book.getId());
     }
-
+    @AfterEach
+    public void deleteDb(){
+        this.bookController.deleteDb();
+    }
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);

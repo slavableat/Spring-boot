@@ -124,7 +124,13 @@ public class BookController {
         bookRepository.delete(book);
         return new ResponseEntity(HttpStatus.OK);
     }
-
+    //FOR TEsts
+    public void deleteDb(){
+        for (Book book:
+                bookRepository.findAll() ) {
+            this.deleteBook(book.getId());
+        }
+    }
 
 
 }
