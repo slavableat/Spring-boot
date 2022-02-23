@@ -44,7 +44,6 @@ class SpringbootHibernateApplicationTests {
         this.mockMvc.perform(get("/authors"))
                 .andDo(print())
                 .andExpect(status().isOk());
-        System.out.println();
     }
     @Test
     void getAllGenresTest() throws Exception{
@@ -120,32 +119,6 @@ class SpringbootHibernateApplicationTests {
                 .andExpect(jsonPath("$.authors.size()").value(book.getAuthors().size()));
     }
 
-    @Test
-    void editBook() throws Exception {
-        Book book=new Book();
-        book.setName("Adventures");
-        Genre genre=new Genre();
-        genre.setName("Fantasy");
-        Author author1=new Author();
-        author1.setName("Tolstoy");
-        Author author2=new Author();
-        author2.setName("Esenin");
-        Author author3=new Author();
-        author3.setName("Dostoevskiy");
-        book.setGenre(genre);
-        book.getAuthors().add(author1);
-        book.getAuthors().add(author2);
-        book.getAuthors().add(author3);
-        bookController.addBook(book);
-        book.setName("Хоббит");
-        book.getGenre().setName("Фэнтези");
-        this.mockMvc.perform(put("/book-edit/{id}",book.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(book)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(book.getName()))
-                .andExpect(jsonPath("$.genre.name").value(book.getGenre().getName()));
-    }
     @AfterEach
     public void deleteDb(){
         this.bookController.deleteDb();

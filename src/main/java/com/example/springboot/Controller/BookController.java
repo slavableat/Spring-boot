@@ -44,12 +44,14 @@ public class BookController {
         book.getGenre().getBooks().add(book);
         genreRepository.save(book.getGenre());
         bookRepository.save(book);
-        for (Author auth : book.getAuthors()) {
-            if (authorRepository.findByName(auth.getName()) != null) {
-                auth = authorRepository.findByName(auth.getName());
+        Iterator<Author> iterator = book.getAuthors().iterator();
+        while (iterator.hasNext()) {
+            Author author = iterator.next();
+            if (authorRepository.findByName(author.getName()) != null) {
+                author = authorRepository.findByName(author.getName());
             }
-            auth.getBooks().add(book);
-            authorRepository.save(auth);
+            author.getBooks().add(book);
+            authorRepository.save(author);
         }
         return new ResponseEntity<>(book,HttpStatus.CREATED);
     }
@@ -124,13 +126,14 @@ public class BookController {
         bookRepository.delete(book);
         return new ResponseEntity(HttpStatus.OK);
     }
+
+
     //FOR TEsts
     public void deleteDb(){
+        List<Book> books=bookRepository.findAll();
         for (Book book:
-                bookRepository.findAll() ) {
+                books ) {
             this.deleteBook(book.getId());
         }
     }
-
-
 }
