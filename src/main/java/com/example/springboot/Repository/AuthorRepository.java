@@ -1,6 +1,6 @@
-package com.example.springboothibernate.Repository;
+package com.example.springboot.Repository;
 
-import com.example.springboothibernate.Model.Author;
+import com.example.springboot.Model.Author;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

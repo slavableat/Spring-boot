@@ -1,4 +1,4 @@
-package com.example.springboothibernate.Model;
+package com.example.springboot.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
