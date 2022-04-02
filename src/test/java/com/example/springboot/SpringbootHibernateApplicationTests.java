@@ -33,35 +33,39 @@ class SpringbootHibernateApplicationTests {
 
     @Autowired
     private BookController bookController;
+
     @Test
-    void getAllBooksTest() throws Exception{
+    void getAllBooksTest() throws Exception {
         this.mockMvc.perform(get("/books"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
     @Test
-    void getAllAuthorsTest() throws Exception{
+    void getAllAuthorsTest() throws Exception {
         this.mockMvc.perform(get("/authors"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
     @Test
-    void getAllGenresTest() throws Exception{
+    void getAllGenresTest() throws Exception {
         this.mockMvc.perform(get("/genres"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
     @Test
-    void addBookTest() throws Exception{
-        Book book=new Book();
+    void addBookTest() throws Exception {
+        Book book = new Book();
         book.setName("Adventures");
-        Genre genre=new Genre();
+        Genre genre = new Genre();
         genre.setName("Fantasy");
-        Author author1=new Author();
+        Author author1 = new Author();
         author1.setName("Tolstoy");
-        Author author2=new Author();
+        Author author2 = new Author();
         author2.setName("Esenin");
-        Author author3=new Author();
+        Author author3 = new Author();
         author3.setName("Dostoevskiy");
         book.setGenre(genre);
         book.getAuthors().add(author1);
@@ -72,46 +76,47 @@ class SpringbootHibernateApplicationTests {
                         .content(asJsonString(book)))
                 .andExpect(status().is2xxSuccessful());
     }
+
     @Test
-    void deleteBookTest() throws Exception{
-        Book book=new Book();
+    void deleteBookTest() throws Exception {
+        Book book = new Book();
         book.setName("Adventures");
-        Genre genre=new Genre();
+        Genre genre = new Genre();
         genre.setName("Fantasy");
-        Author author1=new Author();
+        Author author1 = new Author();
         author1.setName("Tolstoy");
-        Author author2=new Author();
+        Author author2 = new Author();
         author2.setName("Esenin");
-        Author author3=new Author();
+        Author author3 = new Author();
         author3.setName("Dostoevskiy");
         book.setGenre(genre);
         book.getAuthors().add(author1);
         book.getAuthors().add(author2);
         book.getAuthors().add(author3);
         bookController.addBook(book);
-        mockMvc.perform(delete("/delete/{id}",book.getId())
+        mockMvc.perform(delete("/delete/{id}", book.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(book)));
     }
 
     @Test
-    void getBook() throws Exception{
-        Book book=new Book();
+    void getBook() throws Exception {
+        Book book = new Book();
         book.setName("Adventures");
-        Genre genre=new Genre();
+        Genre genre = new Genre();
         genre.setName("Fantasy");
-        Author author1=new Author();
+        Author author1 = new Author();
         author1.setName("Tolstoy");
-        Author author2=new Author();
+        Author author2 = new Author();
         author2.setName("Esenin");
-        Author author3=new Author();
+        Author author3 = new Author();
         author3.setName("Dostoevskiy");
         book.setGenre(genre);
         book.getAuthors().add(author1);
         book.getAuthors().add(author2);
         book.getAuthors().add(author3);
         bookController.addBook(book);
-        this.mockMvc.perform(get("/book-edit/{id}",book.getId()))
+        this.mockMvc.perform(get("/book-edit/{id}", book.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(book.getName()))
@@ -120,9 +125,10 @@ class SpringbootHibernateApplicationTests {
     }
 
     @AfterEach
-    public void deleteDb(){
+    public void deleteDb() {
         this.bookController.deleteDb();
     }
+
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);
