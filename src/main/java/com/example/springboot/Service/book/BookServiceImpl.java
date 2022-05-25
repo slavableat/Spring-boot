@@ -1,4 +1,4 @@
-package com.example.springboot.Service;
+package com.example.springboot.Service.book;
 
 import com.example.springboot.Model.Author;
 import com.example.springboot.Model.Book;
@@ -7,8 +7,6 @@ import com.example.springboot.Repository.AuthorRepository;
 import com.example.springboot.Repository.BookRepository;
 import com.example.springboot.Repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class MainService {
+public class BookServiceImpl implements BookService {
     @Autowired
     private BookRepository bookRepository;
     @Autowired
@@ -25,19 +23,13 @@ public class MainService {
     @Autowired
     private AuthorRepository authorRepository;
 
-    public List<Book> findAllBooks(){
+    @Override
+    public List<Book> findAllBooks() {
         return bookRepository.findAll();
     }
 
-    public List<Genre> findAllGenres(){
-        return genreRepository.findAll();
-    }
-
-    public List<Author> findAllAuthors(){
-        return authorRepository.findAll();
-    }
-
-    public Book addBook(Book book){
+    @Override
+    public Book addBook(Book book) {
         Genre findGenre = genreRepository.findByName(book.getGenre().getName());
         if (findGenre != null) {
             book.setGenre(findGenre);
@@ -45,9 +37,7 @@ public class MainService {
         book.getGenre().getBooks().add(book);
         genreRepository.save(book.getGenre());
         bookRepository.save(book);
-        Iterator<Author> iterator = book.getAuthors().iterator();
-        while (iterator.hasNext()) {
-            Author author = iterator.next();
+        for (Author author : book.getAuthors()) {
             if (authorRepository.findByName(author.getName()) != null) {
                 author = authorRepository.findByName(author.getName());
             }
@@ -57,7 +47,8 @@ public class MainService {
         return book;
     }
 
-    public Book getBookById(Long id){
+    @Override
+    public Book getBookById(Long id) {
         Optional<Book> book = bookRepository.findById(id);
         if (book.isEmpty()) {
             return null;
@@ -65,8 +56,10 @@ public class MainService {
         return book.get();
     }
 
-    public Book editBook(Book book){
-        Book oldBook = bookRepository.findById(book.getId()).get();
+    @Override
+    public Book editBook(Book book) {
+        //поменял
+        Book oldBook = bookRepository.findById(book.getId()).orElseGet(null);
         if (oldBook == null) {
             return null;
         }
@@ -85,9 +78,7 @@ public class MainService {
             }
         }
         mustBEDeleted.clear();
-        Iterator<Author> iterator = book.getAuthors().iterator();
-        while (iterator.hasNext()) {
-            Author author = iterator.next();
+        for (Author author : book.getAuthors()) {
             Author oldAuthor = authorRepository.findByName(author.getName());
             if (oldAuthor != null) {
                 author = oldAuthor;
@@ -116,10 +107,11 @@ public class MainService {
         return oldBook;
     }
 
-    public void deleteById(Long id){
+    @Override
+    public void deleteById(Long id) {
         Book book = bookRepository.findById(id).get();
         if (book == null) {
-            return ;
+            return;
         }
         List<Author> mustBEDeleted = new ArrayList<>();
         for (Author author : book.getAuthors()) {
