@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,10 +21,12 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "b_id")
     @Access(AccessType.PROPERTY)
+    @NotNull
     protected Long id;
 
     @Column(name = "b_name")
     @Access(AccessType.PROPERTY)
+    @NotBlank
     protected String name;
 
     @JsonIgnoreProperties("books")
@@ -32,5 +38,6 @@ public class Book {
     @JsonIgnoreProperties("books")
     @ManyToMany(mappedBy = "books", fetch = FetchType.EAGER)
     @Access(AccessType.PROPERTY)
+    @NotEmpty
     protected Set<Author> authors = new HashSet<>();
 }

@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,12 +20,15 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Access(AccessType.PROPERTY)
     @Column(name = "a_id")
+    @NotNull
     protected Long id;
 
     @Column(name = "a_name")
     @Access(AccessType.PROPERTY)
+    @NotBlank
     protected String name;
 
+    @NotEmpty
     @JsonIgnoreProperties("authors")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "books_authors",

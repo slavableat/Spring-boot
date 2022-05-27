@@ -6,6 +6,8 @@ import com.example.springboot.Model.Genre;
 import com.example.springboot.Repository.AuthorRepository;
 import com.example.springboot.Repository.BookRepository;
 import com.example.springboot.Repository.GenreRepository;
+import com.example.springboot.exception.CustomException;
+import org.apache.taglibs.standard.lang.jstl.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
+
     @Autowired
     private BookRepository bookRepository;
     @Autowired
@@ -48,10 +51,10 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book getBookById(Long id) {
+    public Book getBookById(Long id) throws CustomException {
         Optional<Book> book = bookRepository.findById(id);
         if (book.isEmpty()) {
-            return null;
+            throw new CustomException("Invalid genre id: " + id);
         }
         return book.get();
     }
