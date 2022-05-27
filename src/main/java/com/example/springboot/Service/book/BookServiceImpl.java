@@ -32,7 +32,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book addBook(Book book) {
+    public Book addBook(Book book) throws CustomException {
+        validateBook(book);
         Genre findGenre = genreRepository.findByName(book.getGenre().getName());
         if (findGenre != null) {
             book.setGenre(findGenre);
@@ -60,11 +61,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book editBook(Book book) {
-        //поменял
+    public Book editBook(Book book) throws CustomException {
+        validateBook(book);
         Book oldBook = bookRepository.findById(book.getId()).orElseGet(null);
         if (oldBook == null) {
-            return null;
+            throw new CustomException("Database doesnt have this book");
         }
         if (!book.getName().equals(oldBook.getName())) {
             oldBook.setName(book.getName());
@@ -89,7 +90,7 @@ public class BookServiceImpl implements BookService {
             author.getBooks().add(oldBook);
             authorRepository.save(author);
         }
-        long mustBeDeletedGenreId = -99999; //магическое число - гарантировано удалится
+        long mustBeDeletedGenreId = 0;
         if (!book.getGenre().getName().equals(oldBook.getGenre().getName())) {
             oldBook.getGenre().getBooks().remove(oldBook);
             if (oldBook.getGenre().getBooks().isEmpty()) {
@@ -104,17 +105,17 @@ public class BookServiceImpl implements BookService {
             oldBook.getGenre().getBooks().add(oldBook);
             genreRepository.save(oldBook.getGenre());
         }
-        if (mustBeDeletedGenreId != -99999) {
+        if (mustBeDeletedGenreId != 0) {
             genreRepository.deleteById(mustBeDeletedGenreId);
         }
         return oldBook;
     }
 
     @Override
-    public void deleteById(Long id) {
-        Book book = bookRepository.findById(id).get();
+    public void deleteById(Long id) throws CustomException{
+        Book book = bookRepository.findById(id).orElse(null);
         if (book == null) {
-            return;
+            throw new CustomException("Invalid book id");
         }
         List<Author> mustBEDeleted = new ArrayList<>();
         for (Author author : book.getAuthors()) {
@@ -137,5 +138,19 @@ public class BookServiceImpl implements BookService {
         }
         book.setGenre(null);
         bookRepository.delete(book);
+    }
+
+    @Override
+    public void deleteAllBooks() throws CustomException {
+        for (Book book:
+             this.findAllBooks()) {
+            this.deleteById(book.getId());
+        }
+    }
+
+    private void validateBook(Book book) throws CustomException {
+        if (book.getGenre() == null) throw new CustomException("Book doesnt have genre");
+        if (book.getAuthors() == null ||
+                book.getAuthors().isEmpty()) throw new CustomException("Book doesnt have authors");
     }
 }

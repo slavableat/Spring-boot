@@ -8,11 +8,14 @@ import java.util.List;
 public interface BookService {
     List<Book> findAllBooks();
 
-    Book addBook(Book book);
+    Book addBook(Book book) throws CustomException;
 
     Book getBookById(Long id) throws CustomException;
 
-    Book editBook(Book book);
+    Book editBook(Book book) throws CustomException;
 
-    void deleteById(Long id);
+    void deleteById(Long id) throws CustomException;
+
+    //ToDo: FOR TESTS
+    void deleteAllBooks() throws CustomException;
 }

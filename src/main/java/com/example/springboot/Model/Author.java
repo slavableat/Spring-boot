@@ -3,6 +3,7 @@ package com.example.springboot.Model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -20,7 +21,6 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Access(AccessType.PROPERTY)
     @Column(name = "a_id")
-    @NotNull
     protected Long id;
 
     @Column(name = "a_name")
@@ -28,7 +28,7 @@ public class Author {
     @NotBlank
     protected String name;
 
-    @NotEmpty
+
     @JsonIgnoreProperties("authors")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "books_authors",
@@ -36,5 +36,6 @@ public class Author {
             inverseJoinColumns = @JoinColumn(name = "b_id")
     )
     @Access(AccessType.PROPERTY)
+    @NotEmpty
     protected Set<Book> books = new HashSet<>();
 }
