@@ -1,18 +1,21 @@
 package com.example.springboot.Service.book;
 
+import com.example.springboot.Controller.BookController;
 import com.example.springboot.Model.Author;
 import com.example.springboot.Model.Book;
 import com.example.springboot.Model.Genre;
 import com.example.springboot.Repository.AuthorRepository;
 import com.example.springboot.Repository.BookRepository;
 import com.example.springboot.Repository.GenreRepository;
+import com.example.springboot.Service.CacheService;
 import com.example.springboot.exception.CustomException;
-import org.apache.taglibs.standard.lang.jstl.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.LinkOption;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,10 +28,22 @@ public class BookServiceImpl implements BookService {
     private GenreRepository genreRepository;
     @Autowired
     private AuthorRepository authorRepository;
+    @Autowired
+    private CacheService cacheService;
+
+    private final Logger LOGGER = LoggerFactory.getLogger(BookController.class);
 
     @Override
     public List<Book> findAllBooks() {
-        return bookRepository.findAll();
+        List<Book> books = cacheService.getBooks();
+        if(!books.isEmpty()){
+            LOGGER.info("Gets from memory");
+            return books;
+        }
+        books = bookRepository.findAll();
+        LOGGER.info("Gets from database");
+        cacheService.setBooks(books);
+        return books;
     }
 
     @Override
@@ -48,22 +63,29 @@ public class BookServiceImpl implements BookService {
             author.getBooks().add(book);
             authorRepository.save(author);
         }
+        cacheService.clearCache();
         return book;
     }
 
     @Override
     public Book getBookById(Long id) throws CustomException {
-        Optional<Book> book = bookRepository.findById(id);
-        if (book.isEmpty()) {
-            throw new CustomException("Invalid genre id: " + id);
+        Book book = cacheService.getIfContainsElseGetNull(id);
+        if (book != null) {
+            LOGGER.info("Gets from memory");
+            return book;
         }
-        return book.get();
+        Optional<Book> bookByDatabase = bookRepository.findById(id);
+        if (bookByDatabase.isEmpty()) {
+            throw new CustomException("Invalid book id: " + id);
+        }
+        LOGGER.info("Gets from database");
+        return bookByDatabase.get();
     }
 
     @Override
     public Book editBook(Book book) throws CustomException {
         validateBook(book);
-        Book oldBook = bookRepository.findById(book.getId()).orElseGet(null);
+        Book oldBook = bookRepository.findById(book.getId()).orElse(null);
         if (oldBook == null) {
             throw new CustomException("Database doesnt have this book");
         }
@@ -108,11 +130,12 @@ public class BookServiceImpl implements BookService {
         if (mustBeDeletedGenreId != 0) {
             genreRepository.deleteById(mustBeDeletedGenreId);
         }
+        cacheService.clearCache();
         return oldBook;
     }
 
     @Override
-    public void deleteById(Long id) throws CustomException{
+    public void deleteById(Long id) throws CustomException {
         Book book = bookRepository.findById(id).orElse(null);
         if (book == null) {
             throw new CustomException("Invalid book id");
@@ -138,12 +161,13 @@ public class BookServiceImpl implements BookService {
         }
         book.setGenre(null);
         bookRepository.delete(book);
+        cacheService.clearCache();
     }
 
     @Override
     public void deleteAllBooks() throws CustomException {
-        for (Book book:
-             this.findAllBooks()) {
+        for (Book book :
+                this.findAllBooks()) {
             this.deleteById(book.getId());
         }
     }
